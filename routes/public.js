@@ -1,7 +1,9 @@
 exports.routes = function(app)
 {
-	app.get('/', function(req, res)
+	//all other handle as 404
+	app.get('*', function(req, res)
 	{
-		res.render('index');
+		res.status(404);
+		res.redirect('#/404');
 	});
 };

@@ -8,18 +8,13 @@ var app = express();
 
 app.set('port', 3000);
 app.use(express.static(path.join(__dirname, 'public')));
-
-//serve angular
-angular.routes(app);
+app.use(express.logger());
 
 //setup api routes
 api.routes(app);
 
-//all other goes to angular front end
-app.get('*', function(req, res)
-{
-	res.redirect('/');
-});
+//setup additional routes to angular
+angular.routes(app);
 
 //create http server
 var port = app.get('port');
