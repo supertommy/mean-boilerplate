@@ -9,6 +9,8 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -16,29 +18,33 @@ module.exports = function(grunt)
 		config: {
 			public_dir: 'public',
 			public_js: [
-				'public/app/**/*.js',
-				'public/js/**/*.js'
+				'public/app/**/*.js'
 			],
-			api_dir : 'api',
+			api_dir: 'api',
 			api_js: [
 				'api/**/*.js'
 			],
 
-			build_dir: 'build',
-			compile_dir: 'bin',
+			routes_dir: 'routes',
+			routes_js: [
+				'routes/**/*.js'
+			],
+
+			build_dir: 'build'
 		},
 
 		clean: [
-			'<%= config.build_dir %>',
-			'<%= config.compile_dir %>'
+			'<%= config.build_dir %>'
 		],
 
 		copy: {
-			angular: {
+			public: {
 				files: [
 					{
 						expand: true,
-						src: ['<%= config.public_dir %>/**/*'],
+						src: [
+							'<%= config.public_dir %>/**/*'
+						],
 						dest: '<%= config.build_dir %>'
 					}	
 				]
@@ -48,7 +54,7 @@ module.exports = function(grunt)
 				files: [
 					{
 						expand: true,
-						src: ['<%= config.api_dir %>/**/*', 'routes/**/*', 'server.js'],
+						src: ['<%= config.api_dir %>/**/*', '<%= config.routes_dir %>/**/*', 'server.js'],
 						dest: '<%= config.build_dir %>'
 					}
 				]
@@ -135,6 +141,33 @@ module.exports = function(grunt)
 					logConcurrentOutput: true
 				}
 			}
+		},
+
+		index: {
+			dev: {
+				dir: '<%= config.build_dir %>',
+				src: [
+					'<%= config.public_js %>'
+				]
+			}		
+		},
+	
+
+		concat: {
+			build_public: {
+				src: ['<%= config.public_dir %>/app/**/*.js'],
+				dest: '<%= config.build_dir %>/public/app/app.min.js'
+			}
+		},
+
+		uglify: {
+			build: {
+				files: {
+					'<%= config.build_dir %>/api/api.min.js': [
+
+					]
+				}
+			}
 		}
 	});
 
@@ -142,6 +175,7 @@ module.exports = function(grunt)
 	grunt.registerTask('default', [
 		'clean',
 		'jshint',
+		'index:dev',
 		'concurrent:monitor'
 	]);
 
@@ -150,4 +184,24 @@ module.exports = function(grunt)
 		'jshint',
 		'copy'
 	]);
+
+	//custom tasks
+	grunt.registerMultiTask('index', 'create the index.html file', function()
+	{
+		var jsFiles = this.filesSrc.map(function(file)
+		{
+			return file.replace('public/', '');
+		});
+
+		grunt.file.copy('public/index.tpl.html', 'public/index.html', {
+			process: function(contents, path)
+			{
+				return grunt.template.process(contents, {
+					data: {
+						scripts: jsFiles
+					}
+				});
+			}
+		});
+	});
 };

@@ -21,17 +21,7 @@
   <script src="lib/angular/angular.js"></script>
   <script src="lib/angular/angular-route.js"></script>
 
-  <!-- compiled JavaScript -->
-  <script type="text/javascript" src="app/app.js"></script>
-  <script type="text/javascript" src="app/controllers.js"></script>
-  <script type="text/javascript" src="app/directives.js"></script>
-  <script type="text/javascript" src="app/filters.js"></script>
-  <script type="text/javascript" src="app/services.js"></script>
-
-  <script src="app/app.js"></script>
-  <script src="app/services.js"></script>
-  <script src="app/controllers.js"></script>
-  <script src="app/filters.js"></script>
-  <script src="app/directives.js"></script>
+  <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
+  <script src="<%= file %>"></script><% }); %>
 </body>
 </html>
