@@ -6,7 +6,9 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-nodemon');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -16,6 +18,10 @@ module.exports = function(grunt)
 			public_js: [
 				'public/app/**/*.js',
 				'public/js/**/*.js'
+			],
+			api_dir : 'api',
+			api_js: [
+				'api/**/*.js'
 			],
 
 			build_dir: 'build',
@@ -40,8 +46,12 @@ module.exports = function(grunt)
 		},
 
 		jshint: {
-			src: [
+			public_src: [
 				'<%= config.public_js %>'
+			],
+
+			api_src: [
+				'<%= config.api_js %>'
 			],
 
 			gruntfile: [
@@ -54,7 +64,6 @@ module.exports = function(grunt)
 				newcap: true,
 				noarg: true,
 				undef: true,
-				unused: true,
 				globalstrict: true,
 				maxcomplexity: 5,
 				sub: true,
@@ -62,6 +71,7 @@ module.exports = function(grunt)
 				eqnull: true,
 				browser: true,
 				devel: true,
+				node: true,
 				globals: {
 					'module': true,
 					'angular': true
@@ -76,8 +86,46 @@ module.exports = function(grunt)
 					ext: 'js'
 				}
 			}
-		}
+		},
 
+		watch: {
+			options: {
+				livereload: false
+			},
+
+			gruntfile: {
+				files: 'Gruntfile.js',
+				tasks: ['jshint:gruntfile'],
+				options: {
+					livereload: false
+				}
+			},
+
+			public_src: {
+				files: ['<%= config.public_js %>'],
+				tasks: ['jshint:public_src'],
+				options: {
+					spawn: false
+				}
+			},
+
+			api_src: {
+				files: ['<%= config.api_js %>'],
+				tasks: ['jshint:api_src'],
+				options: {
+					spawn: false
+				}
+			}
+		},
+
+		concurrent: {
+			monitor: {
+				tasks: ['nodemon', 'watch'],
+				options: {
+					logConcurrentOutput: true
+				}
+			}
+		}
 	});
 
 	//register tasks
@@ -85,6 +133,6 @@ module.exports = function(grunt)
 		'clean',
 		'jshint',
 		'copy',
-		'nodemon'
+		'concurrent:monitor'
 	]);
 };

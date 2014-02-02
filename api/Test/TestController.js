@@ -1,3 +1,5 @@
+'use strict';
+
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 
@@ -22,11 +24,10 @@ exports.initDB = function()
 			test.save();
 		}
 	});
-}
+};
 
 exports.create = function(req, res)
 {
-
 };
 
 exports.find = function(req, res)
@@ -37,7 +38,7 @@ exports.find = function(req, res)
 		res.json({
 			'result': 'success',
 			'data': object
-		})
+		});
 	});
 };
 
