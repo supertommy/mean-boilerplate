@@ -38,9 +38,19 @@ module.exports = function(grunt)
 				files: [
 					{
 						expand: true,
-						src: ['<%= config.public_dir %>/*'],
+						src: ['<%= config.public_dir %>/**/*'],
 						dest: '<%= config.build_dir %>'
 					}	
+				]
+			},
+
+			api: {
+				files: [
+					{
+						expand: true,
+						src: ['<%= config.api_dir %>/**/*', 'routes/**/*', 'server.js'],
+						dest: '<%= config.build_dir %>'
+					}
 				]
 			}
 		},
@@ -132,7 +142,12 @@ module.exports = function(grunt)
 	grunt.registerTask('default', [
 		'clean',
 		'jshint',
-		'copy',
 		'concurrent:monitor'
+	]);
+
+	grunt.registerTask('build', [
+		'clean',
+		'jshint',
+		'copy'
 	]);
 };
