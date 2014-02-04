@@ -20,6 +20,14 @@ module.exports = function(grunt)
 			public_js: [
 				'public/app/**/*.js'
 			],
+			publc_lib_js: [
+				'public/lib/angular/angular.js',
+				'public/lib/angular/angular-route.js'
+			],
+			public_css: [
+				'public/css/**/*.css'
+			],
+
 			api_dir: 'api',
 			api_js: [
 				'api/**/*.js'
@@ -43,7 +51,8 @@ module.exports = function(grunt)
 					{
 						expand: true,
 						src: [
-							'<%= config.public_dir %>/**/*'
+							'<%= config.public_dir %>/**/*',
+							'!<%= config.public_dir %>/*.html'
 						],
 						dest: '<%= config.build_dir %>'
 					}	
@@ -145,9 +154,20 @@ module.exports = function(grunt)
 
 		index: {
 			dev: {
-				dir: '<%= config.build_dir %>',
+				dir: '<%= config.public_dir %>',
 				src: [
-					'<%= config.public_js %>'
+					'<%= config.publc_lib_js %>',
+					'<%= config.public_js %>',
+					'<%= config.public_css %>'
+				]
+			},
+
+			build: {
+				dir: '<%= config.build_dir %>/<%= config.public_dir %>',
+				src: [
+					'<%= config.publc_lib_js %>',
+					'<%= config.public_js %>',
+					'<%= config.public_css %>'
 				]
 			}		
 		},
@@ -182,23 +202,43 @@ module.exports = function(grunt)
 	grunt.registerTask('build', [
 		'clean',
 		'jshint',
-		'copy'
+		'copy',
+		'index:build'
 	]);
 
 	//custom tasks
 	grunt.registerMultiTask('index', 'create the index.html file', function()
 	{
-		var jsFiles = this.filesSrc.map(function(file)
+		var filterAndReplace = function(files, filter, replace)
 		{
-			return file.replace('public/', '');
-		});
+			return files.filter(function(file)
+			{
+				return file.match(filter.pattern) !== null;
+			}).map(function(file)
+			{
+				return file.replace(replace.pattern, replace.value);
+			});
+		};
 
-		grunt.file.copy('public/index.tpl.html', 'public/index.html', {
+		var jsFiles = filterAndReplace(
+			this.filesSrc, 
+			{pattern: /\.js$/i},
+			{pattern: 'public/', value: ''}
+		);
+
+		var cssFiles =  filterAndReplace(
+			this.filesSrc,
+			{pattern: /\.css$/i},
+			{pattern: 'public/', value: ''}
+		);
+
+		grunt.file.copy('public/index.tpl.html', this.data.dir + '/index.html', {
 			process: function(contents, path)
 			{
 				return grunt.template.process(contents, {
 					data: {
-						scripts: jsFiles
+						scripts: jsFiles,
+						styles: cssFiles
 					}
 				});
 			}
