@@ -6,6 +6,7 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -20,7 +21,7 @@ module.exports = function(grunt)
 			public_js: [
 				'public/app/**/*.js'
 			],
-			publc_lib_js: [
+			public_lib_js: [
 				'public/lib/angular/angular.js',
 				'public/lib/angular/angular-route.js'
 			],
@@ -104,11 +105,50 @@ module.exports = function(grunt)
 			}
 		},
 
+		karma: {
+			options: {
+				files: [
+					'public/lib/angular/angular.js',
+					'public/lib/angular/angular-route.js',
+					'public/lib/angular-mocks/angular-mocks.js',
+					'public/app/**/*.js',
+					'tests/**/*.spec.js'
+				],
+				reporters: 'dots',
+				frameworks: ['jasmine'],
+				plugins: [
+					'karma-chrome-launcher',
+					'karma-jasmine'
+				],
+				autoWatch: false,
+				port: 9018,
+				runnerPort: 9100,
+				colors: true,
+				browsers: [
+					'Chrome'
+				]
+			},
+
+			unit: {
+				runnerPort: 9101,
+				port: 9877,
+				background: true
+			},
+
+			continuous: {
+				singleRun: true
+			}
+		},
+
 		nodemon: {
 			dev: {
-				script: 'server.js',
+				script: 'server/server.js',
 				options: {
-					ext: 'js'
+					ext: 'js',
+					watch: [
+						'server',
+						'api'
+					]
 				}
 			}
 		},
@@ -128,7 +168,10 @@ module.exports = function(grunt)
 
 			public_src: {
 				files: ['<%= config.public_js %>'],
-				tasks: ['jshint:public_src'],
+				tasks: [
+					'jshint:public_src',
+					'karma:unit:run'
+				],
 				options: {
 					spawn: false
 				}
@@ -136,10 +179,22 @@ module.exports = function(grunt)
 
 			api_src: {
 				files: ['<%= config.api_js %>'],
-				tasks: ['jshint:api_src'],
+				tasks: [
+					'jshint:api_src',
+					'karma:unit:run'
+				],
 				options: {
 					spawn: false
 				}
+			},
+
+			tests: {
+				files: [
+					'<%= karma.options.files %>'
+				],
+				tasks: [
+					'karma:unit:run'
+				]
 			}
 		},
 
@@ -156,7 +211,7 @@ module.exports = function(grunt)
 			dev: {
 				dir: '<%= config.public_dir %>',
 				src: [
-					'<%= config.publc_lib_js %>',
+					'<%= config.public_lib_js %>',
 					'<%= config.public_js %>',
 					'<%= config.public_css %>'
 				]
@@ -165,7 +220,7 @@ module.exports = function(grunt)
 			build: {
 				dir: '<%= config.build_dir %>/<%= config.public_dir %>',
 				src: [
-					'<%= config.publc_lib_js %>',
+					'<%= config.public_lib_js %>',
 					'<%= config.public_js %>',
 					'<%= config.public_css %>'
 				]
@@ -196,14 +251,17 @@ module.exports = function(grunt)
 		'clean',
 		'jshint',
 		'index:dev',
+		'karma:continuous',
+		'karma:unit',
 		'concurrent:monitor'
 	]);
 
 	grunt.registerTask('build', [
 		'clean',
 		'jshint',
-		'copy',
-		'index:build'
+		'index:build',
+		'karma:continuous',
+		'copy'
 	]);
 
 	//custom tasks
