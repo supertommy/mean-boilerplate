@@ -10,36 +10,36 @@ Firstly, you need [Node.js](http://nodejs.org) and [MongoDB](http://docs.mongodb
 
 If you don't have [Grunt](http://gruntjs.com/getting-started) then you will need to install it:
 
-```npm install -g grunt-cli```
+```$ npm install -g grunt-cli```
 
 If you don't have [Bower](http://bower.io/) then you will also need to install it:
 
-```npm install -g bower```
+```$ npm install -g bower```
 
 Now inside a Terminal, go to the project directory and install the packages with ```npm```:
 
-```npm install```
+```$ npm install```
 
-This will install all the dependencies enumerated in the ```package.json``` file.
+This will install all the dependencies enumerated into the ```package.json``` file.
 
 Once that's done, go into the ```public``` directory and run Bower:
 
-```bower install```
+```$ bower install```
 
 This will install all the front-end packages in the ```lib``` folder.
 
 ## Usage
-First start MongoDB in a separate Terminal.
+First start MongoDB in a separate Terminal:
 
-```mongod```
+```$ mongod```
 
 Then go to the project root and run Grunt:
 
-```grunt```
+```$ grunt```
 
 or
 
-```grunt default```
+```$ grunt default```
 
 This will run the ```default``` Grunt task. The ```default``` task will run JSHint, Nodeunit, Karma, and build the index file for the front-end based on the ```index.tpl.html``` file. It will then continously watch for file changes and run JSHint and the unit tests.
 
@@ -48,22 +48,33 @@ Any changes to the back-end code will also result in an automatic restart of the
 So all you need to do is make changes, save, watch the console output, and then try out your changes. No need to rebuild or restart the server manually!
 
 ## Project Structure
-**api** - the back-end
-**build** - where builds are placed
-**node_modules** - packages installed by npm
-**public** - the AngularJS front-end
-**routes** - routing files
-**server** - Express server
-**tests** - unit tests
 
-The directory structure inside these directories can generally be anything you want. How you want to set up your front-end and back-end is up to you.
+```
+mean-boilerplate/
+  |- api/             (the back-end)
+  |- build/           (where builds are placed)
+  |- node_modules/    (packages installed by npm)
+  |- public/          (the AngularJS front-end)
+    |- app            (the main AngularJS app files)
+    |- assets         (assets like images)
+    |- css            (CSS files)
+    |- lib            (third party libraries installed by Bower)
+    |- partials       (AngularJS partials)
+  |- routes/          (routing files)
+  |- server/          (Express server)
+  |- tests/           (unit tests)
+    |- api            (back-end tests)
+    |- public         (front-end tests)
+```
+
+The directory structure inside these directories can generally be anything you want. How the back-end is set up is entirely up to you. The front-end expects all folders except the ```partials``` folder. Views and partials can be placed in the ```app``` folder if you prefer. The general structure is taken directly from the angular-seed project.
 
 ## Making a Build
 There is another Grunt task called ```build```. This task will do a clean of any existing builds, runs JSHint, Nodeunit, Karma, copies files to the builds folder, concats application JavaScript, concats application CSS, minifies the application JavaScript, and creates the appropriate index.html file for the front-end.
 
 This is all placed in the ```build``` folder and can be deployed. You can always test this build manually by going to project root and running:
 
-```node build/server/server.js```
+```$ node build/server/server.js```
 
 You can then go to ```http://localhost:3000``` to see your front-end or ```http://localhost:3000/api``` to hit your back-end.
 
