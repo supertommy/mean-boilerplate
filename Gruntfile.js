@@ -55,7 +55,9 @@ module.exports = function(grunt)
 						src: [
 							'<%= config.public_dir %>/**/*',
 							'!<%= config.public_dir %>/*.html',
-							'!<%= config.public_dir %>/app/**/*.js'
+							'!<%= config.public_dir %>/app/**/*.js',
+							'!<%= config.public_dir %>/css/**/*.css',
+							'!<%= config.public_dir %>/lib/angular-mocks/**'
 						],
 						dest: '<%= config.build_dir %>'
 					}	
@@ -262,15 +264,24 @@ module.exports = function(grunt)
 				src: [
 					'<%= config.public_lib_js %>',
 					'<%= config.build_dir %>/<%= config.public_dir %>/app/**/*.js',
-					'<%= config.public_css %>'
+					'<%= config.build_dir %>/<%= config.public_dir %>/css/**/*.css'
 				]
 			}		
 		},
 	
 		concat: {
-			build_public: {
-				src: ['<%= config.public_dir %>/app/**/*.js'],
+			build_js: {
+				src: [
+					'<%= config.public_js %>'
+				],
 				dest: '<%= config.build_dir %>/public/app/app.min.js'
+			},
+
+			build_css: {
+				src: [
+					'<%= config.public_css %>'
+				],
+				dest: '<%= config.build_dir %>/public/css/app.css'
 			}
 		},
 
