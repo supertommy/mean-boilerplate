@@ -7,6 +7,7 @@ module.exports = function(grunt)
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-karma');
+	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-concurrent');
 	grunt.loadNpmTasks('grunt-nodemon');
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -53,7 +54,8 @@ module.exports = function(grunt)
 						expand: true,
 						src: [
 							'<%= config.public_dir %>/**/*',
-							'!<%= config.public_dir %>/*.html'
+							'!<%= config.public_dir %>/*.html',
+							'!<%= config.public_dir %>/app/**/*.js'
 						],
 						dest: '<%= config.build_dir %>'
 					}	
@@ -64,7 +66,11 @@ module.exports = function(grunt)
 				files: [
 					{
 						expand: true,
-						src: ['<%= config.api_dir %>/**/*', '<%= config.routes_dir %>/**/*', 'server.js'],
+						src: [
+							'<%= config.api_dir %>/**/*',
+							'<%= config.routes_dir %>/**/*',
+							'server/**/*.js'
+						],
 						dest: '<%= config.build_dir %>'
 					}
 				]
@@ -76,8 +82,16 @@ module.exports = function(grunt)
 				'<%= config.public_js %>'
 			],
 
+			public_tests: [
+				'tests/public/**/*.spec.js'
+			],
+
 			api_src: [
 				'<%= config.api_js %>'
+			],
+
+			api_tests: [
+				'tests/api/**/*.spec.js'
 			],
 
 			gruntfile: [
@@ -99,8 +113,19 @@ module.exports = function(grunt)
 				devel: true,
 				node: true,
 				globals: {
+					//angular
 					'module': true,
-					'angular': true
+					'angular': true,
+					'inject': true,
+
+					//Jasmine
+					'describe': true,
+					'it': true,
+					'before': true,
+					'beforeEach': true,
+					'after': true,
+					'afterEach': true,
+					'expect': true
 				}
 			}
 		},
@@ -109,10 +134,9 @@ module.exports = function(grunt)
 			options: {
 				files: [
 					'public/lib/angular/angular.js',
-					'public/lib/angular/angular-route.js',
 					'public/lib/angular-mocks/angular-mocks.js',
 					'public/app/**/*.js',
-					'tests/**/*.spec.js'
+					'tests/public/**/*.spec.js'
 				],
 				reporters: 'dots',
 				frameworks: ['jasmine'],
@@ -138,6 +162,12 @@ module.exports = function(grunt)
 			continuous: {
 				singleRun: true
 			}
+		},
+
+		nodeunit: {
+			all: [
+				'tests/api/**/*.spec.js'
+			]
 		},
 
 		nodemon: {
@@ -177,25 +207,35 @@ module.exports = function(grunt)
 				}
 			},
 
-			api_src: {
-				files: ['<%= config.api_js %>'],
-				tasks: [
-					'jshint:api_src',
-					'karma:unit:run'
-				],
-				options: {
-					spawn: false
-				}
-			},
-
-			tests: {
+			public_tests: {
 				files: [
 					'<%= karma.options.files %>'
 				],
 				tasks: [
 					'karma:unit:run'
 				]
+			},
+
+			api_src: {
+				files: ['<%= config.api_js %>'],
+				tasks: [
+					
+					'nodeunit:all'
+				],
+				options: {
+					spawn: false
+				}
+			},
+
+			api_tests: {
+				files: [
+					'<%= nodeunit.all %>'
+				],
+				tasks: [
+					'nodeunit:all'
+				]
 			}
+			
 		},
 
 		concurrent: {
@@ -221,13 +261,12 @@ module.exports = function(grunt)
 				dir: '<%= config.build_dir %>/<%= config.public_dir %>',
 				src: [
 					'<%= config.public_lib_js %>',
-					'<%= config.public_js %>',
+					'<%= config.build_dir %>/<%= config.public_dir %>/app/**/*.js',
 					'<%= config.public_css %>'
 				]
 			}		
 		},
 	
-
 		concat: {
 			build_public: {
 				src: ['<%= config.public_dir %>/app/**/*.js'],
@@ -238,8 +277,8 @@ module.exports = function(grunt)
 		uglify: {
 			build: {
 				files: {
-					'<%= config.build_dir %>/api/api.min.js': [
-
+					'<%= config.build_dir %>/public/app/app.min.js': [
+						'<%= config.build_dir %>/public/app/app.min.js'
 					]
 				}
 			}
@@ -251,6 +290,7 @@ module.exports = function(grunt)
 		'clean',
 		'jshint',
 		'index:dev',
+		'nodeunit',
 		'karma:continuous',
 		'karma:unit',
 		'concurrent:monitor'
@@ -259,9 +299,12 @@ module.exports = function(grunt)
 	grunt.registerTask('build', [
 		'clean',
 		'jshint',
-		'index:build',
+		'nodeunit',
 		'karma:continuous',
-		'copy'
+		'copy',
+		'concat',
+		'uglify',
+		'index:build'
 	]);
 
 	//custom tasks
@@ -278,16 +321,17 @@ module.exports = function(grunt)
 			});
 		};
 
+		var replacePattern = /(build\/)*(public\/)*/i;
 		var jsFiles = filterAndReplace(
 			this.filesSrc, 
 			{pattern: /\.js$/i},
-			{pattern: 'public/', value: ''}
+			{pattern: replacePattern, value: ''}
 		);
 
 		var cssFiles =  filterAndReplace(
 			this.filesSrc,
 			{pattern: /\.css$/i},
-			{pattern: 'public/', value: ''}
+			{pattern: replacePattern, value: ''}
 		);
 
 		grunt.file.copy('public/index.tpl.html', this.data.dir + '/index.html', {
