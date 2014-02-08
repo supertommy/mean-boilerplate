@@ -1,6 +1,6 @@
 {
-  "name": "mean-seed",
-  "description": "MEAN seed project",
+  "name": "mean-boilerplate",
+  "description": "MEAN starter project",
   "version": "0.0.1",
   "private": true,
   "dependencies": {

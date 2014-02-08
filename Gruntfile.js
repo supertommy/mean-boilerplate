@@ -24,7 +24,9 @@ module.exports = function(grunt)
 			],
 			public_lib_js: [
 				'public/lib/angular/angular.js',
-				'public/lib/angular/angular-route.js'
+				'public/lib/angular-route/angular-route.js',
+				'public/lib/angular-animate/angular-animate.js',
+				'public/lib/angular-cookies/angular-cookies.js'
 			],
 			public_css: [
 				'public/css/**/*.css'
