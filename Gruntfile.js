@@ -55,11 +55,9 @@ module.exports = function(grunt)
 					{
 						expand: true,
 						src: [
-							'<%= config.public_dir %>/**/*',
-							'!<%= config.public_dir %>/*.html',
-							'!<%= config.public_dir %>/app/**/*.js',
-							'!<%= config.public_dir %>/css/**/*.css',
-							'!<%= config.public_dir %>/lib/angular-mocks/**'
+							'<%= config.public_dir %>/assets/**/*',
+							'<%= config.public_dir %>/partials/**/*',
+							'!<%= config.public_dir %>/*.html'
 						],
 						dest: '<%= config.build_dir %>'
 					}	
@@ -264,7 +262,7 @@ module.exports = function(grunt)
 			build: {
 				dir: '<%= config.build_dir %>/<%= config.public_dir %>',
 				src: [
-					'<%= config.public_lib_js %>',
+					'<%= config.build_dir %>/<%= config.public_dir %>/lib/**/*.js',
 					'<%= config.build_dir %>/<%= config.public_dir %>/app/**/*.js',
 					'<%= config.build_dir %>/<%= config.public_dir %>/css/**/*.css'
 				]
@@ -279,6 +277,13 @@ module.exports = function(grunt)
 				dest: '<%= config.build_dir %>/public/app/app.min.js'
 			},
 
+			build_lib: {
+				src: [
+					'<%= config.public_lib_js %>'
+				],
+				dest: '<%= config.build_dir %>/public/lib/lib.min.js'
+			},
+
 			build_css: {
 				src: [
 					'<%= config.public_css %>'
@@ -288,10 +293,18 @@ module.exports = function(grunt)
 		},
 
 		uglify: {
-			build: {
+			build_js: {
 				files: {
 					'<%= config.build_dir %>/public/app/app.min.js': [
 						'<%= config.build_dir %>/public/app/app.min.js'
+					]
+				}
+			},
+
+			build_lib: {
+				files: {
+					'<%= config.build_dir %>/public/lib/lib.min.js': [
+						'<%= config.build_dir %>/public/lib/lib.min.js'
 					]
 				}
 			}
