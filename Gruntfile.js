@@ -61,9 +61,12 @@ module.exports = function(grunt)
 					{
 						expand: true,
 						src: [
-							'<%= config.public_dir %>/assets/**/*',
-							'<%= config.public_dir %>/partials/**/*',
-							'!<%= config.public_dir %>/*.html'
+							'<%= config.public_dir %>/**/*',
+							'!<%= config.public_dir %>/app/**/*',
+							'!<%= config.public_dir %>/css/**/*',
+							'!<%= config.public_dir %>/lib/**/*',
+							'!<%= config.public_dir %>/*.html',
+							'!<%= config.public_dir %>/bower.json'
 						],
 						dest: '<%= config.build_dir %>'
 					}	
