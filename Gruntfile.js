@@ -37,10 +37,16 @@ module.exports = function(grunt)
 				'api/**/*.js'
 			],
 
+			server_dir: 'server',
+
 			routes_dir: 'routes',
 			routes_js: [
 				'routes/**/*.js'
 			],
+
+			tests_dir: 'tests',
+			tests_api: 'tests/api',
+			tests_public: 'tests/public',
 
 			build_dir: 'build'
 		},
@@ -85,7 +91,7 @@ module.exports = function(grunt)
 			],
 
 			public_tests: [
-				'tests/public/**/*.spec.js'
+				'<%= config.tests_public %>/**/*.spec.js'
 			],
 
 			api_src: [
@@ -93,7 +99,7 @@ module.exports = function(grunt)
 			],
 
 			api_tests: [
-				'tests/api/**/*.spec.js'
+				'<%= config.tests_api %>/**/*.spec.js'
 			],
 
 			gruntfile: [
@@ -168,7 +174,7 @@ module.exports = function(grunt)
 
 		nodeunit: {
 			all: [
-				'tests/api/**/*.spec.js'
+				'<%= config.tests_api %>/**/*.spec.js'
 			]
 		},
 
@@ -178,8 +184,8 @@ module.exports = function(grunt)
 				options: {
 					ext: 'js',
 					watch: [
-						'server',
-						'api'
+						'<%= config.server_dir %>',
+						'<%= config.api_dir %>'
 					]
 				}
 			}
@@ -313,7 +319,6 @@ module.exports = function(grunt)
 
 	//register tasks
 	grunt.registerTask('default', [
-		'clean',
 		'jshint',
 		'index:dev',
 		'nodeunit',
