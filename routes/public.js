@@ -1,3 +1,5 @@
+'use strict';
+
 exports.routes = function(app)
 {
 	//all other handle as 404

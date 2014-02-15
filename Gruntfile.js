@@ -108,6 +108,10 @@ module.exports = function(grunt)
 				'<%= config.tests_api %>/**/*.spec.js'
 			],
 
+			routes: [
+				'<%= config.routes_js %>'
+			],
+
 			gruntfile: [
 				'Gruntfile.js'
 			],
@@ -191,7 +195,8 @@ module.exports = function(grunt)
 					ext: 'js',
 					watch: [
 						'<%= config.server_dir %>',
-						'<%= config.api_dir %>'
+						'<%= config.api_dir %>',
+						'<%= config.routes_dir %>'
 					]
 				}
 			}
@@ -243,7 +248,6 @@ module.exports = function(grunt)
 			api_src: {
 				files: ['<%= config.api_js %>'],
 				tasks: [
-					
 					'nodeunit:all'
 				],
 				options: {
@@ -257,6 +261,15 @@ module.exports = function(grunt)
 				],
 				tasks: [
 					'nodeunit:all'
+				]
+			},
+
+			routes: {
+				files: [
+					'<%= config.routes_js %>'
+				],
+				tasks: [
+					'jshint:routes'
 				]
 			}
 			

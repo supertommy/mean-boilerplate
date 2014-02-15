@@ -1,3 +1,5 @@
+'use strict';
+
 var mongoose = require('mongoose');
 
 //include controllers
@@ -24,7 +26,7 @@ exports.routes = function(app)
 			'result': 'success',
 			'data': 'hello api'
 		});
-	})
+	});
 
 	app.get('/api/test', Test.list);
 	app.get('/api/test/:id', Test.find);
