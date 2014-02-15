@@ -22,6 +22,9 @@ module.exports = function(grunt)
 			public_js: [
 				'public/app/**/*.js'
 			],
+			public_index: [
+				'public/index.tpl.html'
+			],
 			public_lib_js: [
 				'public/lib/angular/angular.js',
 				'public/lib/angular-route/angular-route.js',
@@ -212,6 +215,16 @@ module.exports = function(grunt)
 				tasks: [
 					'jshint:public_src',
 					'karma:unit:run'
+				],
+				options: {
+					spawn: false
+				}
+			},
+
+			public_index: {
+				files: ['<%= config.public_index %>'],
+				tasks: [
+					'index:dev'
 				],
 				options: {
 					spawn: false
